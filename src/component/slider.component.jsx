@@ -17,7 +17,11 @@ const isTouchDevice = "ontouchstart" in document.documentElement;
 const Slider = forwardRef(
   ({ sliderHandler, isFound, text, isRightSlide = true }, ref) => {
     const [isUnlocked, setIsUnlocked] = useState(false);
+
+    // for selecting the slider circle to move the circle
     const slider = useRef(null);
+
+    // to get the width of the container
     const container = useRef(null);
 
     let isDragging = false,
@@ -29,7 +33,7 @@ const Slider = forwardRef(
       if (isUnlocked) {
         sliderHandler(isRightSlide, isUnlocked);
       }
-    }, [isUnlocked]);
+    }, [isUnlocked, isRightSlide, sliderHandler]);
 
     useEffect(() => {
       document.addEventListener("keydown", onkeydown);
@@ -40,7 +44,6 @@ const Slider = forwardRef(
         document.addEventListener("mousemove", onDrag);
         document.addEventListener("mouseup", stopDrag);
       }
-      containerWidth = container.current.clientWidth - 50;
       return () => {
         document.removeEventListener("keydown", onkeydown);
         if (isTouchDevice) {
@@ -53,32 +56,33 @@ const Slider = forwardRef(
       };
     });
 
+    // Unlocked the slider
     const setSlider = () => {
+      containerWidth = container.current.clientWidth - 50;
       sliderLeft = containerWidth;
       updateSliderStyle();
       setIsUnlocked(true);
     };
 
-    const deb = useCallback(
-      debounce(() => setSlider(), 100),
-      []
-    );
-
     const onkeydown = (event) => {
-      console.log("keydown");
       if (event.keyCode === 39) {
-        //right arrow
+        //right Yes
         if (isRightSlide && !isUnlocked) {
           deb();
         }
       }
       if (event.keyCode === 37) {
-        //left arrow
+        //left No
         if (!isRightSlide && !isUnlocked) {
           deb();
         }
       }
     };
+    // Using debounce concept to remove ambiguity (that sometime both button get unlocked which is avoided by debounce)
+    const deb = useCallback(
+      debounce(() => setSlider(), 100),
+      [onkeydown]
+    );
 
     const updateSliderStyle = () => {
       slider.current.style.width = sliderLeft + 32 + "px";
@@ -151,6 +155,7 @@ const Slider = forwardRef(
       containerWidth = container.current.clientWidth - 50;
     };
 
+    // bcoz we need access of reset function in parent therefore we used refs here
     useImperativeHandle(ref, () => ({
       reset() {
         if (!isUnlocked) return;
