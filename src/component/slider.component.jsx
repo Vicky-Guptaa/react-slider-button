@@ -5,6 +5,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useCallback,
+  useMemo,
 } from "react";
 
 import { FaAngleDoubleRight } from "react-icons/fa";
@@ -64,6 +65,9 @@ const Slider = forwardRef(
       setIsUnlocked(true);
     };
 
+    // Using debounce concept to remove ambiguity (that sometime both button get unlocked which is avoided by debounce)
+    const deb = useMemo(() => debounce(() => setSlider(), 100),[]);
+
     const onkeydown = (event) => {
       if (event.keyCode === 39) {
         //right Yes
@@ -78,11 +82,6 @@ const Slider = forwardRef(
         }
       }
     };
-    // Using debounce concept to remove ambiguity (that sometime both button get unlocked which is avoided by debounce)
-    const deb = useCallback(
-      debounce(() => setSlider(), 100),
-      [onkeydown]
-    );
 
     const updateSliderStyle = () => {
       slider.current.style.width = sliderLeft + 32 + "px";
