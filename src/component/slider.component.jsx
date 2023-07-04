@@ -1,17 +1,16 @@
 import React, {
+  forwardRef,
   useEffect,
+  useImperativeHandle,
+  useMemo,
   useRef,
   useState,
-  forwardRef,
-  useImperativeHandle,
-  useCallback,
-  useMemo,
 } from "react";
 
-import { FaAngleDoubleRight } from "react-icons/fa";
-import "./style.module.css";
-import { twMerge } from "tailwind-merge";
 import { debounce } from "lodash";
+import { FaAngleDoubleRight } from "react-icons/fa";
+import { twMerge } from "tailwind-merge";
+import "./style.module.css";
 
 const isTouchDevice = "ontouchstart" in document.documentElement;
 
@@ -66,7 +65,7 @@ const Slider = forwardRef(
     };
 
     // Using debounce concept to remove ambiguity (that sometime both button get unlocked which is avoided by debounce)
-    const deb = useMemo(() => debounce(() => setSlider(), 100),[]);
+    const deb = useMemo(() => debounce(() => setSlider(), 100), []);
 
     const onkeydown = (event) => {
       if (event.keyCode === 39) {
